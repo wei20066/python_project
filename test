@@ -1,0 +1,196 @@
+strSerial = "abc"
+    strHex = binascii.b2a_hex(strSerial)
+    # print strHex
+    strhex = strHex.decode("hex")
+    # print strhex
+    serialFd.write(strhex);
+
+
+
+
+
+import wx
+import serial
+import time
+import threading
+class MyFrame(wx.Frame):
+    def __init__(self,parent):
+        print "MyFrame __init__"
+        wx.Frame.__init__(self,parent,-1,'My COM',size=(500,500))#窗口标题栏和大小
+        panel=wx.Panel(self)
+        sizer=wx.BoxSizer(wx.VERTICAL)
+        panel.SetSizer(sizer)
+        self.sendtxt=wx.StaticText(panel,-1,u'发送',(20,50),(50,15))#发送静态文本框
+        self.rectxt=wx.StaticText(panel,-1,u'接收',(20,200),(50,15))#接收静态文本框
+        self.baudratetxt=wx.StaticText(panel,-1,u'波特率',(20,320),(50,15))#波特率静态文本框
+        self.comtxt=wx.StaticText(panel,-1,'com',(20,350),(50,15))#com口静态文本框
+        baudratelist=['300','600','1200','2400','4800','9600','19200','38400','43000','56000','57600','115200']
+        comlist=['com1','com2','com3','com4','com5','com6','com7','com8','com9']
+        self.baudratelistctr=wx.Choice(panel, -1, (70, 320), choices=baudratelist)
+        self.Bind(wx.EVT_CHOICE,self.OnbaudrateCH,self.baudratelistctr)#波特率下拉列表响应函数
+        self.comlistctr=wx.Choice(panel, -1, (70, 350), choices=comlist)
+        self.Bind(wx.EVT_CHOICE,self.OncomlistCH,self.comlistctr)#com下拉列表响应函数
+        self.baudratelistctr.SetSelection(5)
+        self.comlistctr.SetSelection(3)
+        self.sendctr = wx.TextCtrl(panel, -1, pos = (100, 50), size = (200, 100),
+        style=wx.TE_MULTILINE|wx.TE_CENTER)
+        self.recctr = wx.TextCtrl(panel, -1, pos = (100, 200), size = (200, 100), style=wx.TE_MULTILINE|wx.TE_CENTER)
+        self.sendbutton=wx.Button(panel,-1,u'发送',pos=(350,50))#发送按钮
+        self.Bind(wx.EVT_BUTTON,self.OnSend,self.sendbutton)
+        self.ClearRecbutton=wx.Button(panel,-1,u'清空接收列表',pos=(350,200))
+        self.Bind(wx.EVT_BUTTON,self.OnClearRec,self.ClearRecbutton)
+        index=self.baudratelistctr.GetSelection()
+        BaudRate=self.baudratelistctr.GetString(index)#获取波特率
+        index=self.comlistctr.GetSelection()
+        ComNum=self.comlistctr.GetString(index)#获取com口
+        t = threading.Timer(0.1,self.myreceive)
+        t.start()
+        self.Centre()
+        global mycom
+        try:              mycom= serial.Serial(ComNum,BaudRate,timeout=1)
+        except:            wx.MessageBox('open com fail','error')            return None                    def myreceive(self):        try:            n=mycom.inWaiting()        except:            return None        if n!=0:            str1=mycom.read(n)            self.recctr.Value=str1           t = threading.Timer(0.1,self.myreceive)        t.start()    def OnClearRec(self,event):        self.recctr.Value=''        def OnbaudrateCH(self,event):        global mycom        index=self.baudratelistctr.GetSelection()        BaudRate=self.baudratelistctr.GetString(index)#获取波特率        mycom.setBaudrate(BaudRate)        print mycom.inWaiting                   def OncomlistCH(self,event):        global mycom        index=self.comlistctr.GetSelection()        ComNum=self.comlistctr.GetString(index)#获取com口                try:            mycom.setPort(ComNum)        except:            wx.MessageBox('change port fail','error')            return None        print mycom.inWaiting    def OnSend(self,event):                    #发送处理程序        value=self.sendctr.GetValue()        n=mycom.write(value)       '''    def OnRec(self,event):                     #接收处理程序        n=mycom.inWaiting()        str1=mycom.read(n)        self.recctr.Value=str1'''class MyApp(wx.App): #自定义应用程序对象     def OnInit(self):        print "MyApp OnInit"        self.frame = MyFrame(None)        id=self.frame.GetId()        print "Frame ID:",id        self.frame.Show(True)        return True    def OnExit(self):        print "MyApp OnExit"                mycom.close()                time.sleep(2)           if __name__ == '__main__':     print "Main start"        app = MyApp() #使用从wx.App继承的子类    print "Before MainLoop"    app.MainLoop()    print "After MainLoop"
+
+
+
+
+
+def str_to_ascii(argv):
+    return binascii.b2a_hex(argv)
+
+
+def hex_show(argv):
+    result = ''
+    hLen = len(argv)
+    for i in xrange(hLen):
+        hvol = ord(argv[i])
+        hhex = '%02x'%hvol
+        result += hhex+' '
+    print 'hexShow:', result
+
+
+
+
+     data=search_card(serialFd)
+    if (data!= 0):
+        print(data)
+    else:
+        halt_read(serialFd)
+        flag = 1
+        while flag < 3:
+            data = search_card(serialFd)
+            if (data != 0):
+                print(data)
+                beep(serialFd)
+                break
+            else:
+                flag = flag + 1
+                halt_read(serialFd)
+        print("find card is null")
+        beep(serialFd, 4)
+        exit(1)
+    # load keyword on RAM ,for M1 card
+    if load_key(serialFd) != 0:
+        print("load key fialed")
+        beep(serialFd, 4)
+        exit(2)
+    #  authentication
+    if auth_key(serialFd) != 0:
+        print("authentication fialed")
+        beep(serialFd,4)
+        exit(3)
+    read_card(serialFd)
+
+
+
+     '''
+    seconds = 35400
+    m, s = divmod(seconds, 60)
+    h, m = divmod(m, 60)
+    print("%d:%02d:%02d" % (h, m, s))
+    str=int(1553693895)
+    print(hex(str))
+    #print(str(hex(str)))
+    timeArray = time.localtime(str)
+    otherStyleTime = time.strftime("%Y-%m-%d %H:%M:%S", timeArray)
+    print(otherStyleTime)
+ '''
+s = "高德路"
+# 把字符串s编码成unicode
+st = s.encode("unicode_escape")
+print(st)
+
+# 把字符串解码成utf-8,得到unicode的字符串
+st = st.decode("utf-8")
+print(st)
+
+# 把字符串中的\u替换掉,得到十六进制unicode字符串
+st = st.replace("\\u", "")
+print(st)
+
+
+# 获取字符串前4位,代表字符串中的第一个字
+m_b = st[:4]
+print(m_b)
+
+# 把十六进制字符串转为int类型数字,可直接存入字符数组中
+# 这里需要注意的是一个汉字需要2个字节存放
+# 把汉字存放的时候需要把一个字拆开两位转换存放
+# 修改上一步操作m_b = st[:2]即可拿到前两位
+m_c = int(m_b, 16)
+print(m_c)
+
+# 把int转成十六进制
+m_d = hex(m_c)
+print(m_d)
+
+
+
+ u = urllib.unquote('%E5%8C%97%E4%BA%AC')
+    print u
+    a = '\xe5\xbb\x8a\xe5\x9d\x8a\xe4\xb8\xad\xe5\xbf\x83\xe8\xbe\xb9\xe7\xbc\x98'.decode('utf-8')
+    print a
+    b='\xd9\x14'.decode('gbk')
+    print(b)
+
+
+    start=0xA1A0
+end=0xF7FF
+
+i = 0
+for code in range(start, end):
+# 十六进制数转换成字符串，如0xd640转换成'd640'
+hex_str = '%x' % code
+
+# 从十六进制数字字符串创建一个字节对象
+# 如'd640'转换成b'\xd6@'，其中'@'为ASCII码0x40对应的字符
+bytes_obj = bytes.fromhex(hex_str)
+try:
+# 使用GB2312编解码器对字节对象进行解码，由此得到汉字
+print('%6X%-3s' % (code, str(bytes_obj,'gb2312')),end='')
+except Exception as e:
+print('%6X ' % code, end='')
+i += 1
+if i % 16 == 0: print() # 控制换行
+
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+ __author__ = 'x1ang.li'
+ import logging, os, argparse, textwrap
+ import time
+ import chardet
+ # Default configuration will take effect when corresponding input args are missing.
+ # Feel free to change this for your convenience.DEFAULT_CONF = {    # Only those files ending with extensions in this list will be scanned or converted.    'exts'      : ['cfg'],    'overwrite' : False,    'add_BOM'   : False,    'convert_UTF'   : False,    'confi_thres' : 0.8,} # We have to set a minimum threshold. Only those target_encoding results returned by chartdet that are above that threshold level would be accepted.# See https://github.com/x1angli/convert2utf/issues/4 for further details   logging.basicConfig(format='%(levelname)s:%(message)s', level=logging.INFO)log = logging.getLogger(__name__)  class Convert2Utf8:    def __init__(self, args):        self.args = args      def walk_dir(self, dirname):        for root, dirs, files in os.walk(dirname):            for name in files:                extension = os.path.splitext(name)[1][1:].strip().lower()                # On linux there is a newline at the end which will cause the match to fail, so we just 'strip()' the '\n'                # Also, add 'lower()' to ensure matching                 if (extension in self.args.exts):                    fullname = os.path.join(root, name)                    try:                        self.convert_file(fullname)                    except IOError:                        log.error("Unable to read or write the file: %s. Please check the file's permission.", fullname)                    except KeyboardInterrupt:                        log.warning("Interrupted by keyboard (e.g. Ctrl+C)")                        exit()                    # else:                    #     log.error("Unable to process the file: %s. Please check.", fullname)                    #     traceback.print_stack()       def convert_file(self, filename):        with open(filename, 'rb') as f: # read under the binary mode            bytedata = f.read()         if len(bytedata) == 0:            log.info("Skipped empty file %s", filename)            return         chr_res = chardet.detect(bytedata)        if chr_res['encoding'] == None or chr_res['confidence'] < DEFAULT_CONF['confi_thres']:            log.warning("Ignoring %s, since its encoding is unable to detect.", filename)            return         src_enc = chr_res['encoding'].lower()        log.debug("Scanned %s, whose encoding is %s ", filename, src_enc)         if (src_enc == 'ascii'):            log.info("Skipped %s, whose encoding is %s", filename, src_enc)            return         if (not self.args.convert_utf) and src_enc.startswith('utf'):            log.info("Skipped %s, whose encoding is %s", filename, src_enc)            return         # Since chardet only recognized all GB-based target_encoding as 'gb2312', the decoding will fail when the text file        # contains certain special charaters. To make it more special-character-tolerant, we should        # upgrade the target_encoding to 'gb18030', which is a character set larger than gb2312.        if src_enc.lower() == 'gb2312':            src_enc = 'gb18030'         try:            strdata = bytedata.decode(src_enc)        except UnicodeDecodeError as e:            log.error("Unicode error for file %s", filename)            print(e)            return         # preserving file time information (modification time and access time)        src_stat = os.stat(filename)         # if the 'overwrite' flag is 'False', we would make a backup of the original text file.        if not self.args.overwrite:            backup_name = filename + '.' + str(int(round(time.time() * 1000))) + '.bak'            log.info("Renaming %s to %s", filename, backup_name)            os.rename(filename, backup_name)         tgt_enc = self.args.target_encoding        log.debug("Writing the file: %s in %s", filename, tgt_enc)        with open(filename, 'wb') as f: # write under the binary mode            f.write(strdata.encode(tgt_enc))        log.info("Converted the file: %s from %s to %s", filename, src_enc, tgt_enc)         # setting the new file's time to the old file        os.utime(filename, times = (src_stat.st_atime, src_stat.st_ctime))    # end of def convert_file(self, filename)       def run(self):        root = self.args.root        if not os.path.exists(root):            log.error("The file specified %s is neither a directory nor a regular file", root)            return         log.info("Start working now!")         if os.path.isdir(root):            log.info("The root is: %s. ", root)            log.info("Files with these extension names will be inspected: %s", self.args.exts)            self.walk_dir(root)        else:            log.info("Wow, only a single file will be processed: %s", root)            self.convert_file(root)         log.info("Finished all.")    # end of def run(self, root): def clean_backups(dirname):    if not os.path.isdir(dirname):        log.error("The file specified %s is not a directory ", dirname)        return     now = time.time()    last40min = now - 60 * 40     log.info("Removing all newly-created .bak files under %s", dirname)     for root, dirs, files in os.walk(dirname):        for name in files:            extension = os.path.splitext(name)[1][1:]            if extension == 'bak':                fullname = os.path.join(root, name)                ctime = os.path.getctime(fullname)                if ctime > last40min:                    os.remove(fullname)                    log.info("Removed the file: %s", fullname)  def cli():    parser = argparse.ArgumentParser(        prog='cvt2utf8',        description="A tool that converts non-UTF-encoded text files UTF-8 encoded files.",        epilog="You can use this tool to remove BOM from .php source code files, or convert other target_encoding into UTF-8")     parser.add_argument(        'root',        metavar = "filename",        help    = textwrap.dedent('''\            the path pointing to the file or directory.            If it's a directory, files contained in it with specified extensions will be converted to UTF-8.            Otherwise, if it's a file, only that file will be converted to UTF-8.''')        )     parser.add_argument(        '-e',        '--exts',        nargs   = '+', # '+'. Just like '*', all command-line args present are gathered into a list.        default = DEFAULT_CONF['exts'],        help    = "the list of file extensions. Only those files ending with extensions in this list will be converted.",        )     parser.add_argument(        '-o',        '--overwrite',        action  = 'store_true',        default = DEFAULT_CONF['overwrite'],        help    = "Danger! If you turn this switch on, it would directly overwrite existing file without creating any backups.",        )     parser.add_argument(        '-u',        '--cvtutf',        action  = 'store_true',        dest    = 'convert_utf',        default = DEFAULT_CONF['convert_UTF'],        help    = "By default, we will skip files whose encodings are UTF (including UTF-8 and UTF-16), and BOM headers in these files will remain unchanged. "                  "But, if you want to change BOM headers for these files, you could utilize this option to change their signatures.",        )     parser.add_argument(        '-b',        '--addbom',        action  = 'store_true',        dest    = 'add_bom',        default = DEFAULT_CONF['add_BOM'],        help    = "If this command line argument is missing, we convert files to UTF-8 without BOM (i.e. the target encoding would be just 'utf-8'). "                  "But with this flag, we would add BOM in encoded text files (i.e. the target encoding would be 'utf-8-sig').",        )     parser.add_argument(        '-c',        '--cleanbak',        action  = 'store_true',        dest    = 'clean_bak',        default = False,        help    = textwrap.dedent('''Clean all .bak files generated within last 40 minutes.                        When enabled, no files will be converted to UTF-8. Use this flag with extra caution! '''),        )      args = parser.parse_args()     if args.clean_bak:        clean_backups(args.root)     else:        args.target_encoding = 'utf-8-sig' if args.add_bom else 'utf-8'         cvt2utf8 = Convert2Utf8(args)        cvt2utf8.run() if __name__ == '__main__':    cli()
+
+def beep(serialfd,once=1):
+    dat=pack_cmd(beep_word)
+    if int(once) > 1:
+        for i in range(1,int(once)):
+            serialfd.write(dat)
+            serialFd.read(7)
+    else:
+        serialfd.write(dat)
+        serialFd.read(7)
+
+
+#小端字节序转为大端字节序
+def little2big_endian(hex_string):	big_endian_str = '' #定义一个空字符串	for i in range(len(hex_string)/4):#因为Unicode是4个字符表示一个汉字，每四个一组		little_endian_char = hex_string[i*4: i*4+4] #取的是四位连续的数字		big_endian_char = little_endian_char[2:4] + little_endian_char[0:2] #逆字节序		big_endian_str = big_endian_str + big_endian_char	return big_endian_str #十六进制数字(大端序)转换成汉字(unicode编码)def HextoHanzi(hex_string):	unicode_Hanzi = '' #定义一个空字符串	for i in range(len(hex_string)/4): #因为Unicode是4个字符表示一个汉字，每四个一组		Hex_char = hex_string[i*4: i*4+4]		unicode_char = "\\u" + Hex_char		unicode_Hanzi = unicode_Hanzi + unicode_char	return unicode_Hanzi.decode('unicode_escape') hex_string = '1162B07328572857005F1A4F62546153A16C265EAB8EB98F'big_endian_str = little2big_endian(hex_string)print HextoHanzi(big_endian_str)

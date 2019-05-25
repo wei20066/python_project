@@ -241,10 +241,12 @@ if __name__ == '__main__':
             continue
         else:
             break
-    name = empname.decode('gbk', 'ignore').encode('utf-8')
+    name = empname.decode('gbk', 'ignore').encode('gb2312')
     print(name)
-    b='\xd5\xc5\xd1\xa7\xd3\xd1'.decode('gbk', 'ignore').encode('utf-8')
-    print(b)
+    #b='\xd5\xc5\xd1\xa7\xd3\xd1'.decode('gbk', 'ignore').encode('utf-8')
+    #print(b)
+    #bytes([0x01, 0x02, 0x31, 0x32])
+
     beep(serialFd, beep_word)
     #read_sector(serialFd, auth_sector4)
     #find_m1_card(serialFd,1)
