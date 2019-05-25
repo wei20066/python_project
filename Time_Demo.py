@@ -57,7 +57,30 @@ if __name__ == '__main__':
     data2='0CC80E03000000000000000000000000'
     user_name=hex_to_han_zi(data2)
     print(user_name)
-
+    #hex_string = '1162B07328572857005F1A4F62546153A16C265EAB8EB98F'
+    #big_endian_str = little2big_endian(hex_string)
+    #print HextoHanzi(big_endian_str)
+#
+   #data='202020202020202020203130303033'
+   #empno = ''
+   #for i in range(0, len(data), 2):
+   #    print(data[i:i + 2])
+   #    if data[i:i + 2] != '20':
+   #        empno = empno + binascii.a2b_hex(data[i:i + 2])
+   #        continue
+   #    else:
+   #        continue
+   #print(empno)
+   #print(int(binascii.a2b_hex(data)))
+    #aa = '\xd6\xd0\xb9\xfa\xb9\xa4\xc9\xcc\xd2\xf8\xd0\xd0\xd7\xdc\xd0\xd0\xc7\xe5\xcb\xe3\xd6\xd0\xd0\xc4'
+    #print(aa.decode('gbk').encode('utf-8'))
+    data2='0CC80E03'
+    #para = '20133233'
+    print(hex_to_han_zi(data2))
+    #print(numberstr_to_hexstr(para))
+    #hex_string = '1162B07328572857005F1A4F62546153A16C265EAB8EB98F'
+    #big_endian_str = little2big_endian(data2)
+    #print HextoHanzi(big_endian_str)
 
 
 
